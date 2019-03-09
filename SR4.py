@@ -234,11 +234,20 @@ class Bitmap(object):
         for x in range(self.height):
             for y in range(self.width):
                 f.write(self.framebuffer[x][y])
-        f.close() 
-     #Funcion para cargar el archivo obj y llenarlo 
-    def load2(self, filename, tra, sca):
-        mod = Obj(filename)
+        f.close()
 
+    def mtl(self,filename):
+    	colMTL=[]
+    	with open(filename) as lins:
+    		for lin in lins:
+    			if 'Kd' in lin:
+    				colMTL.append(lin.split())
+    	return colMTL
+     #Funcion para cargar el archivo obj y llenarlo 
+    def load2(self,filename,mat, tra, sca):
+        mod = Obj(filename)
+        colMTL=self.mtl(mat)
+        mat2=colMTL[0]
         luz = V3(0, 0, 1)
 
         for car in mod.cars:
@@ -261,7 +270,7 @@ class Bitmap(object):
                 c = self.transform(mod.vertex[f3], tra, sca)
                 if gray < 0:
                     continue
-                self.triangle(a, b, c, color(gray, gray, gray))
+                self.triangle(a, b, c, color(round(round(float(mat2[1])*255)*inte),round(round(float(mat2[2])*255)*inte),round(round(float(mat2[3])*255)*inte)))
             else:
                 f1 = car[0][0] - 1
                 f2 = car[1][0] - 1
@@ -279,13 +288,13 @@ class Bitmap(object):
                 gray = round(255 * inte)
                 if gray < 0:
                     continue
-                self.triangle(a, b, c, color(gray, gray, gray))
-                self.triangle(a, c, d, color(gray, gray, gray))
+                self.triangle(a, b, c, color(round(round(float(mat2[1])*255)*inte),round(round(float(mat2[2])*255)*inte),round(round(float(mat2[3])*255)*inte)))
+                self.triangle(a, c, d, color(round(round(float(mat2[1])*255)*inte),round(round(float(mat2[2])*255)*inte),round(round(float(mat2[3])*255)*inte)))
 
 r = Bitmap()
 r.glInit()
 r.glCreateWindow(800, 600)
-r.load2('mono.obj', (4, 4, 0), (100, 100, 100))
+r.load2('mono.obj','mono.mtl',(4, 4, 0), (100, 100, 100))
 print('pendiente 1 :',r.sumalista(tri1T))
 print('pendiente 2 :',r.sumalista(tri2T))
 r.glFinish('SR.bmp')
